@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>播放主页面</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.css"/>
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+
+		<script type="text/javascript">
+			var flag=false;//用于判断歌曲是否正在播放
+			var descant=null;//用于储存当前播放的歌曲
+			function dbl(mustbid){
+				var url="http://localhost:8080/musicXM/playmus";
+				$.ajax({
+					type:"post",
+					url:url,
+					data:{mustbid:mustbid},//向后台传入一个id，用于根据id查值
+					success:function(musway){
+						//获取歌曲的路径
+						var mus="music/"+musway;
+						//判断歌曲是否在播放且播放的是不是同一首歌
+						if(flag&&musway==descant){
+							alert('歌曲已在播放中！');
+						}else{//当点击一首歌时，将歌曲的路径储存起来，判断是否为同一首歌曲
+							descant=musway;
+							document.getElementById('aud').src=mus;
+							document.getElementById('aud').play();
+							flag=true;
+						}
+					}
+				});
+			}
+			$(document).ready(function(){
+				var url="http://localhost:8080/musicXM/showmus";
+				$.ajax({
+					type:"post",
+					url:url,
+					success:function(data){
+						//从数据库将已有的歌曲查出来，放入表格中
+						$("#tb").append(data);
+					}
+				});
+				//编辑个人信息
+				document.getElementById('bianji').onclick=function(){
+					var right=document.getElementsByClassName('rightdiv')[1];
+					right.style.display="none";
+				}
+//				-----------------------------------------------
+				//get请求传输昵称，不完善！！！！
+				//leftdiv中的头像和昵称来自于数据库，以下代码是写leftdiv的
+//				var url=location.search;
+//				alert(url);
+//				if (url.indexOf("?") != -1) {
+//				var name=url.indexOf("=");//查找=的位置
+//		        var str = url.substr(name+1);
+//		        alert(str);
+//  			}
+//				----------------------------------------------
+				//传输头像和昵称，从后台接收
+				var url="http://localhost:8080/musicXM/nicknameheadServlet";
+				$.ajax({
+					type:"post",
+					url:url,
+					success:function(data){
+						//将昵称、头像和性别传入页面中
+		//				1 获取
+						var nick=document.getElementById('nick');
+						var img=document.getElementById('tou');
+						var sex=document.getElementById('se');
+		//				2 处理字符串
+						var i=data.indexOf(",");
+						var j=data.indexOf(";");
+						var username=data.substring(0,i);
+						var im=data.substring(i+1,j);
+						var se=data.substring(j+1);
+						console.log(im);
+						nick.innerHTML=username;
+//						img.src=im;
+						sex.innerHTML=se;
+						$('#img').attr("src",im);
+					}
+				});
+				//上传即修改头像
+				//获得昵称
+				var nick=$('#nick');//全局变量
+				$('#xiugaiimg').click(function(){
+					$('#entire').fadeIn();
+					var ii=$('#tou').prop('src');
+					$('#img').attr("src",ii);
+				});
+				$('#u').click(function(){
+					$('input[type=file]').click();
+				});
+				$('#p').click(function(){
+					$('#img').attr("src","img/img1.jpg");
+				});
+				function img(){
+					$('#img').attr("src","");//用户的原头像
+				}
+				$('#x').click(function(){
+					setTimeout(img,1000);
+					$('#entire').fadeOut();
+				});
+				//修改头像
+				$('#affirm').click(function(){
+					uplo();
+					$('#entire').fadeOut();
+					//局部刷新
+					$.ajax({
+						type:"post",
+						url:"http://localhost:8080/musicXM/nameServlet",
+						success:function(data){
+//							console.log(data);
+							$('#tou').attr("src",data);
+						}
+					});
+				});
+			});
+			function uplo(){
+					var form = document.getElementById('upload');
+			    	formData = new FormData(form);
+				$.ajax({
+					type:"post",
+					url:"http://localhost:8080/musicXM/uploadimgServlet",
+					data:formData,
+					processData:false, 
+			   		contentType:false,
+			   		success:function(res){ 
+					    if(res){ 
+					     alert("上传成功！"); 
+					    } 
+					   },
+					error:function(err){ 
+					    alert("网络连接失败,稍后重试",err); 
+					   }
+				});
+				}
+			
+			
+			
+			var image = '';
+				 function selectImage(file) {
+			        if (!file.files || !file.files[0]) {
+			            return;
+			        }
+			        var reader = new FileReader();
+			        reader.onload = function (evt) {
+			            document.getElementById('img').src = evt.target.result;
+			            image = evt.target.result;
+			        }
+			        reader.readAsDataURL(file.files[0]);
+			   }
+		</script>
+		<style type="text/css">
+			.leftdiv{
+				background-size: 150px 530px;
+				background-image: url(img/timg.jpg);
+				height: 530px; width: 150px; 
+				position: absolute;
+				text-align: center;
+			}
+			.rightdiv{
+				background-image: url(img/img21.jpg);
+				background-size: 1200px 530px; 
+				height: 530px; width: 1200px; 
+				position: absolute;
+				left: 150px;
+			}
+			.downdiv{
+				background-image: url(img/img22.jpg); 
+				background-size: 1350px 100px;
+				height: 100px; width: 1350px;
+				position: absolute;
+				top: 530px;
+				text-align: center;
+			}
+			
+			body{
+				overflow: hidden;
+			}
+			#tou{
+				height: 100px;
+				width: 100px;
+				margin-top: 20px;
+				border-top-left-radius:50% ;
+				border-top-right-radius:50% ;
+				border-bottom-left-radius: 50%;
+				border-bottom-right-radius:50% ;
+			}
+			a{
+				color: black;
+				text-decoration: none;
+				margin-top: 10px;
+			}
+			#aud{
+				margin-top: 30px;
+			}
+			
+			#entire{
+					background-color: cornflowerblue;
+					width: 300px;
+					height: 450px;
+					display: none;
+					position: fixed;
+					left: 50%;
+					z-index: 999;
+				}  
+				.update-top{
+					background-color: #CABDFD;
+					line-height: 30px;
+				}
+				#x:hover{
+					background-color: red;
+					transition: 2s; 
+				}
+				.central{
+					background-color: gainsboro;
+					width: 100%;
+					height: 85%;
+				}
+				#img{
+					width: 260px;
+					height: 260px;
+					border: black solid 1px;
+				}
+				.bottom{
+					background-color: #A6A6A6;
+					line-height: 37.5px;
+				}
+				#file{
+					display: none;
+				}
+		</style>
+	</head>
+	<!--修改头像小窗口-->
+		<!--全局div-->
+		<div id="entire">
+			<!--顶部小导航条-->
+			<div class="update-top">
+				<span style="color: white;margin-left: 5px;">更换头像</span>
+				<div style="float: right;font-weight: bold;width: 30px;text-align: center;" id="x"><a href="javascript:void(0)" style="text-decoration: none;color: black;">X</a></div>
+			</div>
+			<!--中部-->
+			<div class="central">
+				<div class="central-top" style="text-align: center;line-height: 60px;" >
+					<span class="btn btn-default btn-sm" id="u">
+						<span class="glyphicon glyphicon-open"></span>
+						上传本地头像
+					</span>
+					<span class="btn btn-default btn-sm" id="p">
+						使用推荐头像
+					</span>
+				</div>
+				<div class="central-img" style="text-align: center;">
+					<img src="" id="img"/>
+				</div>
+				<div class="FriendlyLink" style="text-align: center;line-height: 50px;">
+					<a href="https://glyphicons.com/" style="text-decoration: none;color: black;">本站友情链接</a>
+				</div>
+			</div>
+			<!--底部-->
+			<div class="bottom" style="text-align: center;">
+				<span class="btn btn-info btn-sm" style="margin-right: 10px;" id="affirm" >
+					确定
+				</span>
+				<span class="btn btn-default btn-sm">
+					取消
+				</span>
+			</div>
+		</div>
+		<form id="upload" enctype="multipart/form-data" method="post">
+		<input type="file" name="file" id="file" onchange="selectImage(this);"/>
+		</form>
+		
+	<!--以上是修改头像小窗口-->
+	<!------------------------------------------------------->
+	
+	
+	<div class="leftdiv">
+		<div class="">
+			<h4 id="nick"></h4>
+		<label>性别：</label><h5 id="se"></h5>
+		<img src="" id="tou"/>
+			<span class="btn btn-default" id="xiugaiimg">修改头像</span>
+		<div><a class="btn btn-default" role="button" id="bianji">编辑信息</a></div>
+		<div id="next_last" style="margin-top: 10px;">
+			<button class="glyphicon glyphicon-chevron-left"></button>
+			<button class="glyphicon glyphicon-chevron-right"></button>
+		</div>
+		</div>
+	</div>
+	<div class="rightdiv">
+		<table class="table table-striped" >
+			<tr><th>编辑个人信息</th></tr>
+			<tr>
+				<td><label>昵称：</label></td>
+				<td colspan="3"><input type="text" name="" id="" value="" /></td>
+			</tr>
+			<tr>
+				<td><label>介绍：</label></td>
+				<td colspan="3"><textarea rows="3" cols="20"></textarea></td>
+				
+			</tr>
+			<tr>
+				<td><label>性别：</label></td>
+				<td><input type="radio" name="sex" id="sex" value="" />男</td>
+				<td><input type="radio" name="sex" id="sex" value="" />女</td>
+				<td><input type="radio" name="sex" id="sex" value="" />保密</td>
+			</tr>
+			<tr>
+				<td><label>生日：</label></td>
+				<td><select></select></td>
+				<td><select></select></td>
+				<td><select></select></td>
+			</tr>
+			<tr>
+				<td><label>地区：</label></td>
+				<td><select></select></td>
+				<td colspan="2"><select></select></td>
+			</tr>
+			<tr style="text-align: center;">
+				<td colspan="2"><button class="btn btn-default" type="submit">保存</button></td>
+				<td colspan="2"><button class="btn btn-default" type="submit">取消</button></td>
+			</tr>
+		</table>
+	</div>
+	<div class="rightdiv">
+		<table class="table table-hover" id="tb">
+				<tr><th>序号</th><th>歌曲名</th></tr>
+				
+		</table>
+	</div>
+	<div class="downdiv">
+		<audio loop="loop" id="aud" controls="controls" src="C:\Users\Administrator\Desktop\无损音乐下载\download\BINGBIAN病变 (女声版) - 鞠文娴.mp3">？？</audio>
+	</div>
+	<body>
+	</body>
+</html>

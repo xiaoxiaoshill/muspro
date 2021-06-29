@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>注册页面</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.css"/>
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				//判断用户名密码是否为空，是的话就阻止提交
+				$('#exampleInputEmail1').blur(function(){
+					var valu=$('#exampleInputEmail1').val();
+//					console.log(valu);
+					if(valu==""){
+						$('#spyhm').text("注：用户名不能为空");
+					}else{
+						$('#spyhm').text("");
+					}
+				});
+				$('#exampleInputPassword1').blur(function(){
+					var valu=$('#exampleInputPassword1').val();
+//					console.log(valu);
+					if(valu==""){
+						$('#spmima').text("注：密码不能为空");
+					}else{
+						$('#spmima').text("");
+					}
+				});
+				//----------------------------判断用户名和密码
+				$('#sub').click(function(){
+					var username=$('#exampleInputEmail1').val();
+					var userpassword=$('#exampleInputPassword1').val();
+					var url="http://localhost:8080/musicXM/AddsuerServlet";
+					var da=new Date();
+					var time=da.toLocaleString();
+					var onlyid=Math.floor(Math.random()*89999+10000);
+					if(username!=""&&userpassword!=""){
+						$.ajax({
+							type:"post",
+							url:url,
+							data:{username:username,userpassword:userpassword,time:time,onlyid:onlyid}
+						});
+						alert("注册成功！");
+						return;
+					}
+					alert("请填写用户名或密码！！");
+					return false;
+				});
+			});
+		</script>
+		<style type="text/css">
+			span{
+				color: red;
+			}
+		</style>
+	</head>
+	<body>
+	<form>
+  <div class="form-group">
+    <label for="exampleInputEmail1">用户名</label>
+    <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email">
+    <span id="spyhm"></span>
+  </div>
+  <div class="form-group">
+    <label for="exampleInputPassword1">密码</label>
+    <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+    <span id="spmima"></span>
+  </div>
+  <button type="button" class="btn btn-default" id="sub">确认注册</button>
+  <a href="entry.html">有账号！去登录</a>
+	</form>
+	</body>
+</html>

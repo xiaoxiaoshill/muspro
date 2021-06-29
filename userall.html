@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>成员页面</title>
+		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.css"/>
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			var userid;
+			function btn(id){
+					$('#textid').val(id);
+					userid=$('#textid').val();
+//					console.log(userid);//测试id是否存在
+					$.ajax({
+						type:"post",
+						url:"http://localhost:8080/musicXM/userdeleteServlet",
+						data:{userid:userid}
+					});
+					location.reload();//刷新页面
+			}
+			$(document).ready(function(){
+				var url="http://localhost:8080/musicXM/userallServlet";
+				$.ajax({
+					type:"post",
+					url:url,
+					success:function(data){
+						$("table").append(data);
+//						var obj=JSON.parse(data);
+//						console.log(obj.name);
+//						for(var i in date){
+//							console.log(data);
+//						}
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<input type="hidden" name="textid" id="textid" value="" />
+		<table class="table table-bordered">
+			<th>序号</th><th>职位</th><th>用户名</th><th>密码</th><th>添加时间</th><th>删除用户</th>
+     </table>
+	</body>
+</html>

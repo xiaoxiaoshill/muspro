@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>enty音乐上传目录</title>
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			$(document).ready(function(){
+				var url="http://localhost:8080/musicXM/er.do";
+				$('#btn').click(function(){
+//				var uploader=$('#uploader').val();
+				var filed=document.getElementById('tf');
+				var form=new FormData(filed);
+				$.ajax({
+					url:url, 
+					type:'post',
+					data:form,
+					processData:false,
+                    contentType:false,
+				});
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="mulu">
+			<form id="tf">
+				上传者: <input type="text" name="uploader" value="" /><br />
+				<!--上传歌曲: <input type="file" name="file" value="" /><br />-->
+				<input type="button" name="btn" id="btn" value="上传"/>
+			</form>
+		</div>
+	</body>
+</html>

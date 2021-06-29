@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="bootstrap-3.3.7-dist/css/bootstrap.css"/>
+		<script src="js/jquery-1.11.0.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			function dbl(mustbid){
+				var url="http://localhost:8080/musicXM/playmus";
+				$.ajax({
+					type:"post",
+					url:url,
+					data:{mustbid:mustbid},
+					success:function(musway){
+						document.getElementById('aud').src=musway;
+					}
+				});
+			}
+			$(document).ready(function(){
+				var url="http://localhost:8080/musicXM/showmus";
+				$.ajax({
+					type:"post",
+					url:url,
+					success:function(data){
+						$("table").append(data);
+					}
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div id="index">
+			<table class="table table-hover">
+				<th>序号</th><th>歌曲名</th>
+				
+			</table>
+			<audio loop="loop" id="aud" controls="controls" src="music/出山（Cover：花粥） - 你的叽叽&黄诗扶HBY.mp3">？？</audio>
+		</div>
+	</body>
+</html>
